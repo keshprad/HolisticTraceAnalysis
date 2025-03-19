@@ -53,7 +53,7 @@ def normalize_path(path: str) -> str:
     return normalized_path
 
 
-NCCL_KERNEL_RE = re.compile(r"^nccl.*Kernel")
+NCCL_KERNEL_RE = re.compile(r"^(ncclKernel|ncclDevKernel|rccl_main_kernel)")
 
 
 def is_comm_kernel(name: str) -> bool:
@@ -66,7 +66,7 @@ def is_comm_kernel(name: str) -> bool:
     Returns:
         A boolean indicating if the kernel is a communication kernel.
     """
-    return NCCL_KERNEL_RE.match(name) is not None
+    return NCCL_KERNEL_RE.search(name) is not None
 
 
 MEMORY_KERNEL_RE = re.compile(r"(^Memcpy)|(^Memset)|(^dma)")
