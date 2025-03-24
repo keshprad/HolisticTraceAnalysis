@@ -358,6 +358,7 @@ def _parse_trace_dataframe_json(
     local_symbol_table: TraceSymbolTable = TraceSymbolTable()
     if "traceEvents" in trace_record:
         df = pd.DataFrame(trace_record["traceEvents"])
+        df = df.apply(append_rccl_collective_type_to_name, axis=1)
         round_down_time_stamps(df)
 
         # assign an index to each event
@@ -368,6 +369,11 @@ def _parse_trace_dataframe_json(
 
     return meta, df, local_symbol_table
 
+def append_rccl_collective_type_to_name(row):
+    if row['name'] == "rccl_main_kernel(ncclDevComm*, unsigned long, ncclWork*)" and \
+        "Collective name" in row['args']:
+        row['name'] = f"{row['name']}_{row['args']['Collective name']}"
+    return row
 
 # @profile
 def _parse_trace_dataframe_ijson(
